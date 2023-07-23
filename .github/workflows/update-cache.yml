@@ -1,0 +1,23 @@
+name: Update Caches
+
+on:
+  push:
+    branches: ['master']
+
+jobs:
+  update-cache:
+    name: Update Cache
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the Backend
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 19.x
+          cache: 'npm'
+
+      - name: Install Backend Dependencies
+        run: npm ci
