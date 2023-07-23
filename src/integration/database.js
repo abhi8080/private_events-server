@@ -35,9 +35,12 @@ const db = {
 // Start db connection
 (async () => {
   try {
+    if (process.env.NODE_ENV === 'acctest')
+      await sequelize.sync({ force: true });
+    else await sequelize.sync();
+
     await sequelize.authenticate();
 
-    await sequelize.sync();
     console.log(
       'Connection has been established successfully.'.cyan.underline.bold
     );

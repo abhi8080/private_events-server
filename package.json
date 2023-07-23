@@ -6,7 +6,8 @@
     "start": " node src/index.js",
     "dev": "nodemon src/index.js",
     "lint": "eslint ./src --ext .js,.jsx --no-fix --max-warnings 0",
-    "test": "jest --setupFiles dotenv/config --silent --verbose --runInBand --detectOpenHandles --coverage"
+    "test": "jest --setupFiles dotenv/config --silent --verbose --runInBand --detectOpenHandles --coverage",
+    "acctest": "set NODE_ENV=acctest&& nodemon src/index.js"
   },
   "dependencies": {
     "apollo-server-express": "^3.12.0",
