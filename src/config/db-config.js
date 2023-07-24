@@ -1,3 +1,9 @@
+/**
+ * The database configuration module containing the options that
+ * are used by the integration layer to create a connection to
+ * the database.
+ */
+
 module.exports = {
   HOST: process.env.DATABASE_HOST,
   PORT: process.env.DATABASE_PORT,
