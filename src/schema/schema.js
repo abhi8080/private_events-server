@@ -53,10 +53,10 @@ const resolvers = {
      * @param {*} param2 The context.
      * @returns {Promise<Array<Event>>} All the events.
      */
-    events: async (_, _, { token }) => {
-      return await sequelize.transaction(async (transaction) => {
+    events: async (_, __, { token }) => {
+      return await sequelize.transaction(async () => {
         authorizeRequest(token);
-        const events = await Event.findAll({ transaction });
+        const events = await Event.findAll();
         return events;
       });
     },
@@ -69,9 +69,9 @@ const resolvers = {
      * @returns {Promise<Event>} The event with the given id.
      */
     event: async (_, { id }, { token }) => {
-      return await sequelize.transaction(async (transaction) => {
+      return await sequelize.transaction(async () => {
         authorizeRequest(token);
-        const event = await Event.findByPk(id, { transaction });
+        const event = await Event.findByPk(id);
         return event;
       });
     },
@@ -84,10 +84,10 @@ const resolvers = {
      * @returns {Promise<User>} The currently logged-in user.
      */
     user: async (_, __, { token }) => {
-      return await sequelize.transaction(async (transaction) => {
+      return await sequelize.transaction(async () => {
         authorizeRequest(token);
         const decodedToken = verifyToken(token);
-        const user = await User.findByPk(decodedToken.id, { transaction });
+        const user = await User.findByPk(decodedToken.id);
         return user;
       });
     },
@@ -101,12 +101,9 @@ const resolvers = {
      * @returns {Promise<String>} The authentication token for the new user.
      */
     registerUser: async (_, { username, password }) => {
-      return await sequelize.transaction(async (transaction) => {
+      return await sequelize.transaction(async () => {
         const hashedPassword = await generateHash(password);
-        const user = await User.create(
-          { username, password: hashedPassword },
-          { transaction }
-        );
+        const user = await User.create({ username, password: hashedPassword });
         const token = generateToken(user);
         return token;
       });
@@ -119,11 +116,8 @@ const resolvers = {
      * @returns {Promise<String>} The authentication token for the authenticated user.
      */
     loginUser: async (_, { username, password }) => {
-      return await sequelize.transaction(async (transaction) => {
-        const user = await User.findOne(
-          { where: { username } },
-          { transaction }
-        );
+      return await sequelize.transaction(async () => {
+        const user = await User.findOne({ where: { username } });
         if (!user) {
           throw new Error('Invalid login credentials');
         }
@@ -218,10 +212,9 @@ const resolvers = {
      * @returns {Promise<Array<Event>>} The events created by the user.
      */
     createdEvents: async (parent) => {
-      return await sequelize.transaction(async (transaction) => {
+      return await sequelize.transaction(async () => {
         const events = await Event.findAll({
           where: { creatorId: parent.id },
-          transaction,
         });
         return events;
       });
@@ -233,10 +226,9 @@ const resolvers = {
      * @returns {Promise<Array<Event>>} The events attended by the user.
      */
     attendedEvents: async (parent) => {
-      return await sequelize.transaction(async (transaction) => {
+      return await sequelize.transaction(async () => {
         const user = await User.findByPk(parent.id, {
           include: [{ model: Event, through: EventAttendee }],
-          transaction,
         });
         const attendedEvents = user.Events;
         return attendedEvents;
@@ -251,8 +243,8 @@ const resolvers = {
      * @returns {Promise<User>} The user who created the event.
      */
     creator: async (parent) => {
-      return await sequelize.transaction(async (transaction) => {
-        const user = await User.findByPk(parent.creatorId, { transaction });
+      return await sequelize.transaction(async () => {
+        const user = await User.findByPk(parent.creatorId);
         return user;
       });
     },
@@ -263,7 +255,7 @@ const resolvers = {
      * @returns {Promise<Array<User>>} The users attending the event.
      */
     attendees: async (parent) => {
-      return await sequelize.transaction(async (transaction) => {
+      return await sequelize.transaction(async () => {
         const attendees = await User.findAll({
           include: [
             {
@@ -272,7 +264,6 @@ const resolvers = {
               through: { attributes: [] },
             },
           ],
-          transaction,
         });
         return attendees;
       });
